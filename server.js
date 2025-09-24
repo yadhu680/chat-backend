@@ -20,7 +20,7 @@ const idToLower = new Map();
 //   id, userId, username, text, cleanText, private:bool, targets: [userIds], targetsUsernames:[], timestamp, readBy: [userIds]
 // }
 const chatHistory = [];
-const MAX_HISTORY = 200;
+const MAX_HISTORY = 100;
 
 // Extend badWords as needed
 const badWords = [
