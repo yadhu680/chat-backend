@@ -96,7 +96,7 @@ function getVisibleHistoryForUser(userIdLower) {
     } else {
       // private: show only if viewer is sender or in targets
       const lowerViewer = userIdLower;
-      const isSenderLower = lower(m.username) === lowerViewer;
+      const isSenderLower = m.userLower === lowerViewer;
       const isTarget = m.targetsLower.includes(lowerViewer);
       if (isSenderLower) {
         // sender sees original (filtered for profanity) with mentions preserved (server filters profanity earlier)
@@ -292,6 +292,7 @@ wss.on('connection', (ws) => {
           id: msgId,
           userId: senderId,
           username: senderName,
+          userLower: thisLower, // add for easy history check
           originalText: filteredText, // sender sees filtered text (bad words replaced) including mentions
           cleanText: filteredText.replace(/@\w+\b\s*/gi, '').trim(), // for recipients
           private: true,
