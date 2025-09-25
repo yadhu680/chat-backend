@@ -175,19 +175,32 @@ wss.on('connection', (ws) => {
     if (t === 'register') {
       let desired = String(data.username || '').trim();
       if (!desired) {
-        send(ws, { type: 'error', message: 'Username required' });
+        send(ws, { type: 'error', message: 'Enter your name first!' });
+        return;
+      }
+      // validate username: only letters, numbers, underscore, dot; 3-20 chars
+      const usernamePattern = /^[a-zA-Z0-9._]{3,20}$/;
+
+      if (!usernamePattern.test(desired)) {
+        ws.send(
+          JSON.stringify({
+            type: 'error',
+            message:
+              'Invalid name! Only letters, numbers, underscore, or dot (3–20 chars) allowed.',
+          })
+        );
         return;
       }
 
       // ensure uniqueness: if desired already exists and is online, append suffix
       let candidate = desired;
-      let suffix = 1;
+      /*let suffix = 1;
       while (
         usersByLower.has(lower(candidate)) &&
         usersByLower.get(lower(candidate)).ws
       ) {
         candidate = `${desired}#${suffix++}`;
-      }
+      }*/
 
       const assigned = candidate;
       const assignedLower = lower(assigned);
@@ -255,10 +268,10 @@ wss.on('connection', (ws) => {
       const timestamp = new Date().toISOString();
       const msgId = uuidv4();
 
-      // find mentions (all @username tokens)
-      const mentions = [...filteredText.matchAll(/@(\w+)/gi)].map((m) => m[1]);
-      const mentionsLower = mentions.map((m) => lower(m));
-      const uniqueLowerTargets = [...new Set(mentionsLower)];
+      // find mention (@username)
+      const mention = lower(data.to); //[...filteredText.matchAll(/@(\w+)/gi)].map((m) => m[1]);
+      //const mentionsLower = mentions.map((m) => lower(m));
+      const uniqueLowerTargets = [...new Set(mention ? [mention] : [])];
 
       if (uniqueLowerTargets.length > 0) {
         // translate mention lowers into target info (id, username) if present
